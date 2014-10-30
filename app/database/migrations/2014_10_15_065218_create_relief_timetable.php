@@ -12,6 +12,7 @@ class CreateReliefTimetable extends Migration {
      */
     public function up()
     {
+        //If the table exists, drop it
         if (Schema::hasTable('relief_timetable')) {
             CreateReliefTimetable::down();
         }
@@ -22,6 +23,7 @@ class CreateReliefTimetable extends Migration {
             $table->unsignedInteger('mc_id');
             $table->integer('slot');
             $table->string('relief_short_name');
+            $table->boolean('confirmed')->default(false);
         });
 
         Schema::table('relief_timetable', function($table)

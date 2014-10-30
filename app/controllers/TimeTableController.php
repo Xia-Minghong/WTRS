@@ -3,9 +3,10 @@
 class TimeTableController extends BaseController {
 
 	/**
-	 * Display a listing of the resource.
-	 * GET /admin/timetable
-	 *
+     * Create a view for:
+     * If $short_name specified, show the timetable, if the teacher does not have one, a form is displayed
+     * If no $short_name, a list of all teacher without timetables are shown
+     *
 	 * @return Response
 	 */
     public function index($short_name = null)
@@ -19,6 +20,12 @@ class TimeTableController extends BaseController {
 
 	}
 
+    /**
+     * Query and return timetable(s)
+     *
+     * @param null $short_name
+     * @return mixed
+     */
     private function getTimeTableFromDB($short_name = null)
     {
         if ($short_name) {
@@ -31,6 +38,11 @@ class TimeTableController extends BaseController {
 //        return Timetable::all();
     }
 
+    /**
+     * Read and process raw timetables from the excel sheet uploaded
+     *
+     * @return array
+     */
     private function getTimeTableFromFile()
     {
         //temporary array whcih stores timetable with all 5 days in a week for each teach in a row
@@ -78,9 +90,8 @@ class TimeTableController extends BaseController {
     }
 
 	/**
-	 * Store a newly created resource in storage.
-	 * POST /admin/timetable
-	 *
+	 * Store the timetables into the database
+     *
 	 * @return Response
 	 */
 	public function store()
@@ -112,6 +123,12 @@ class TimeTableController extends BaseController {
         }
 	}
 
+    /**
+     * Process and store the timetable created through the form
+     *
+     * @param $short_name
+     * @return mixed
+     */
 	public function create($short_name)
 	{
         $inputs = Input::except('_token');

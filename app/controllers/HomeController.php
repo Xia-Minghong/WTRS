@@ -15,6 +15,11 @@ class HomeController extends BaseController {
 	|
 	*/
 
+    /**
+     * Create the view of homepage, which is the leave submission page
+     *
+     * @return mixed
+     */
     public function submitMC()
     {
         return View::make('submitMC');

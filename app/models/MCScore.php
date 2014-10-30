@@ -23,12 +23,21 @@ class MCScore extends Eloquent {
      */
     protected $primaryKey = 'short_name';
 
+    /**
+     * Allow mass assignment on the following variables
+     * @var array
+     */
     protected $fillable = array('mc_score');
 
+    /**
+     * Modeling the relationship with the Teacher model
+     *
+     * @return mixed
+     */
     public function teacher()
     {
-        //relaitonship with the Teacher model
-        return $this->hasOne('Teacher', 'short_name', 'short_name'); //related model, foreign key, local key
+        return $this->hasOne('Teacher', 'short_name', 'short_name');
+        //related model, foreign key, local key
     }
 }
 

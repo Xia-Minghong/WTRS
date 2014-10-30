@@ -222,11 +222,11 @@ $('.TimeTableForm').bootstrapValidator({
             message: 'The file is not valid',
             validators: {
                 notEmpty: {
-                    message: 'You must choose a file'
+                    message: 'Please choose a file.'
                 },
                 file: {
                     extension: 'xls,xlsx,csv',
-                    message: 'The selected file is of right format!'
+                    message: 'The selected file is of wrong format!'
                 }
             }
         }
@@ -240,11 +240,11 @@ $('.ParticularForm').bootstrapValidator({
             message: 'The file is not valid',
             validators: {
                 notEmpty: {
-                    message: 'You must choose a file'
+                    message: 'Please choose a file.'
                 },
                 file: {
                     extension: 'xls,xlsx,csv',
-                    message: 'The selected file is of right format!'
+                    message: 'The selected file is of wrong format!'
                 }
             }
         }

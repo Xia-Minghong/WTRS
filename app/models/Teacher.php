@@ -31,21 +31,34 @@ class Teacher extends Eloquent implements UserInterface, RemindableInterface {
      */
     protected $primaryKey = 'short_name';
 
+    /**
+     * Modeling the relationship with the MCScore model
+     *
+     * @return mixed
+     */
     public function mc_score()
     {
-        //relaitonship with the MCScore model
+
         return $this->hasOne('MCScore', 'short_name', 'short_name'); //related model, foreign key, local key
     }
 
+    /**
+     * Modeling the relationship with the Absence model
+     *
+     * @return mixed
+     */
     public function absence()
     {
-        //relaitonship with the Absence model
         return $this->hasMany('Absence', 'short_name', 'short_name'); //related model, foreign key, local key
     }
 
+    /**
+     * Modeling the relationship with the Timetable model
+     *
+     * @return mixed
+     */
     public function timetables()
     {
-        //relaitonship with the Timetable model
         return $this->hasMany('Timetable', 'short_name', 'short_name'); //related model, foreign key, local key
     }
 }

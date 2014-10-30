@@ -3,9 +3,8 @@
 class TeacherController extends \BaseController {
 
 	/**
-	 * Display a listing of the resource.
-	 * GET /signin
-	 *
+	 * Create a view for the sign-in page
+     *
 	 * @return Response
 	 */
 	public function signin()
@@ -13,6 +12,11 @@ class TeacherController extends \BaseController {
         return View::make("signin");
 	}
 
+    /**
+     * Verify the NRIC entered by the teacher and redirect the client according to the result
+     *
+     * @return mixed
+     */
     public function signinVerify()
     {
         if ($teacher = Teacher::where('nric', '=', Input::get('nric'))->first())
@@ -23,6 +27,11 @@ class TeacherController extends \BaseController {
         return Redirect::to('/signin')->withErrors(array('message'=>'Invalid NRIC!'));
     }
 
+    /**
+     * Sign-out the teacher
+     *
+     * @return mixed
+     */
     public function signout()
     {
         Auth::teacher()->logout();

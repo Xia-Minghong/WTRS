@@ -2,14 +2,12 @@
 
 class ParticularController extends \BaseController {
 
-	/**
-	 * Display a listing of the resource.
-	 * GET /particular
-	 *
-	 * @return Response
-	 */
 
-    // The headers of all the fields included in the excel with index
+    /**
+     * The headers of all the fields included in the excel with their column indexes
+     *
+     * @var array
+     */
     protected static $header_index = array(
         'S/No' => 1,
         'nric' => 2,
@@ -21,13 +19,17 @@ class ParticularController extends \BaseController {
         'department' => 9,
         'email_address'=> 10,
 //        'Class' => 10,
-//        'contact_nos'=> 11,
+        'contact_nos'=> 12,
 //        'EXCO' => 10,
 //        'Remarks' => 11,
 //        'Notebook S/No' => 12,
     );
 
-    //Only the following fields are stored in the database
+    /**
+     * The fields that are actually needed to be stored in the database
+     *
+     * @var array
+     */
     protected static $shrink_rule = array(
         'nric',
         'title',
@@ -36,21 +38,38 @@ class ParticularController extends \BaseController {
         'designation',
         'grouping',
         'email_address',
-//        'contact_nos',
+        'contact_nos',
     );
 
+    /**
+     * Convert a column header name into corresponding index as defined in $header_index
+     *
+     * @param $field
+     * @return mixed
+     */
     public static function get_header_index($field)
     {
         return ParticularController::$header_index[$field];
     }
 
-	public function index($teacherid = null)
+    /**
+     * Create the view displaying a list of teachers' particulars
+     *
+     * @param null $teacherid
+     * @return mixed
+     */
+	public function index()
 	{
         $particulars = $this->getParticularFromDB();
 
-        return View::make('admin/reports/showparticular')->with('teacherid',$teacherid)->with('results',$particulars);
+        return View::make('admin/reports/showparticular')->with('results',$particulars);
 	}
 
+    /**
+     * A function to extract teachers' particulars records from the uploaded excel sheet
+     *
+     * @return array
+     */
     private function getParticularFromFile()
     {
         $particulars = array();
@@ -62,19 +81,17 @@ class ParticularController extends \BaseController {
 
         //remove empty lines
         foreach ($rawtables as $particular) {
-            if (!$particular->isEmpty() && $particular->get('2')!='') { //NRIC non-empty
+            if (!$particular->isEmpty() && $particular->get('3')!='') { //Full name non-empty
                 array_push($particulars, $particular);
             }
         }
 
-        //Merging classes with grades
         return $particulars;
     }
 
 	/**
-	 * Store a newly created resource in storage.
-	 * POST /particular
-	 *
+	 * Validate and store the particulars into the database.
+     *
 	 * @return Response
 	 */
 	public function store()
@@ -85,21 +102,26 @@ class ParticularController extends \BaseController {
         $filename = 'particulars';
         $upload_success = Input::file('particularfile')->move($destinationPath, $filename);
 
-
-        //Srhink the particulars to only some fields
-        $particulars = $this->shrink($this->getParticularFromFile(), ParticularController::$shrink_rule);
-
-        //purge the file after processing
-        File::delete(public_path().'/uploads/particulars');
-
         if( $upload_success ) {
+            //Srhink the particulars to only some fields
+            $particulars = $this->shrink($this->getParticularFromFile(), ParticularController::$shrink_rule);
+
+            //purge the file after processing
+            File::delete(public_path().'/uploads/particulars');
+
             //Check for name duplicates before purge and insert
             $short_names = array();
-            foreach ($particulars as $particular) {
+            foreach ($particulars as &$particular) { //enable modification
                 if (!$particular['short_name']) {
-                    return Redirect::to('admin/actions/upload')->withErrors(['type'=>'particular','success'=>false, 'message'=>"Empty short names found"]);
+                    $particular['short_name'] = $particular['full_name'];
+                    //fallback using full name as the short_name (primary key) in case of an empty short name
+
+//                    @Depreciated error message
+//                    return Redirect::to('admin/actions/upload')->withErrors(['type'=>'particular','success'=>false, 'message'=>"Empty short names found"]);
                 }
+
                 array_push($short_names, $particular['short_name']);
+
                 //If duplicates found, error
                 if (count($short_names) !== count(array_unique($short_names))) {
                     return Redirect::to('admin/actions/upload')->withErrors(['type'=>'particular','success'=>false, 'message'=>"Duplicated short names found"]);
@@ -113,13 +135,22 @@ class ParticularController extends \BaseController {
 
             //Perform referential check on MC scores
             $this->updateMcScore();
-//            return $particulars;
+
             return Redirect::to('admin/actions/upload')->withErrors(['type'=>'particular','success'=>true]);
         } else {
             return Redirect::to('admin/actions/upload')->withErrors(['type'=>'particular','success'=>false, 'message'=>"Upload Failed"]);
         }
 	}
 
+    /**
+     * A function to shrink the full sheet from the file into the format that
+     * is ready to be stored into the database, with only the columns defined
+     * in $shrink_rule
+     *
+     * @param $particulars
+     * @param $shrink_rule
+     * @return array
+     */
     public function shrink($particulars, $shrink_rule)
     {
         $shrinked_particulars = array();
@@ -143,11 +174,19 @@ class ParticularController extends \BaseController {
         return $shrinked_particulars;
     }
 
+    /**
+     * Query and return the teachers' particulars from the database
+     *
+     * @return mixed
+     */
     private function getParticularFromDB()
     {
         return $teachers = Teacher::all();
     }
 
+    /**
+     * A function to create a MC score record for newly added teachers
+     */
     private function updateMcScore()
     {
         //add MC scores of 0 for new teachers

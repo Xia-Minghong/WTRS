@@ -12,6 +12,7 @@ class CreateMcScore extends Migration {
      */
     public function up()
     {
+        //If the table exists, drop it
         if (Schema::hasTable('mc_score')) {
             CreateMcScore::down();
         }
@@ -26,8 +27,15 @@ class CreateMcScore extends Migration {
         {
             //setting primary key
             $table->primary('short_name');
-            //enforce referential integrity on the foreign key
-            $table->foreign('short_name')->references('short_name')->on('teacher')->onDelete('cascade');
+
+            //@Depreciated
+            //No enforce referential integrity on the foreign key
+            //As according the business rule,
+            //MC scores need to be kept as records even if teachers particulars are re-uploaded
+            //Records with no references will be checked and deleted
+            //during the particulars uploading processing
+            //
+            //$table->foreign('short_name')->references('short_name')->on('teacher')->onDelete('cascade');
         });
     }
 

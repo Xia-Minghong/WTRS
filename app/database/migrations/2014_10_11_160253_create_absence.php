@@ -12,6 +12,7 @@ class CreateAbsence extends Migration {
 	 */
 	public function up()
 	{
+        //If the table exists, drop it
         if (Schema::hasTable('absence')) {
             CreateAbsence::down();
         }

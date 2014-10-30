@@ -71,9 +71,9 @@
         <div class="form-inline" >
           <div ng-show="record.relief_short_name">{% record.relief_short_name %}</div>
           <input type="text" class="form-control" name="{% record.record_id %}" ng-hide="record.relief_teacher.length" placeholder="Name in Timetable">
-          <select class="form-control" name="{% record.record_id %}" ng-hide="!record.relief_teacher.length">
+          <select class="form-control" name="{% record.record_id %}" ng-hide="!record.relief_teacher.length || record.confirmed==1">
               <option value="{% relief_teacher.short_name %}" ng-repeat="relief_teacher in record.relief_teacher">
-              Grp {% relief_teacher.grouping %} | {% relief_teacher.short_name %} | {% relief_teacher.mc_score %}
+              Grp {% relief_teacher.grouping %} | {% relief_teacher.full_name %} | {% relief_teacher.mc_score %}
               </option>
           </select>
         </div>
@@ -86,7 +86,7 @@
 
 
 
-<div class="row" ng-hide="!records.length">
+<div class="row" ng-hide="!records.length || records.0.confirmed==1">
 
 
 @if(!($errors->has() && $errors->get('final')))
@@ -102,7 +102,7 @@
 @endif
 </div>
 <div class="row" ng-show="!records.length">
-<div class="alert alert-success">No Relif to be assigned.</div>
+<div class="alert alert-success">No relif to be assigned.</div>
 </div>
 {{ FORM::close() }}
 

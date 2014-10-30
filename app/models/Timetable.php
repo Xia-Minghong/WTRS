@@ -25,9 +25,13 @@ class Timetable extends Eloquent
      */
     protected $primaryKey = array('short_name', 'day');
 
+    /**
+     * Modeling the relationship with the Teacher model
+     *
+     * @return mixed
+     */
     public function teacher()
     {
-        //relaitonship with the Teacher model
         return $this->belongsTo('Teacher', 'short_name', 'short_name'); //related model, foreign key, local key
     }
 }

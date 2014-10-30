@@ -12,9 +12,11 @@ class CreateAdmin extends Migration {
      */
     public function up()
     {
+        //If the table exists, drop it
         if (Schema::hasTable('admin')) {
             CreateAdmin::down();
         }
+
         Schema::create('admin', function(Blueprint $table)
         {
             $table->increments('id');   //defualt primary key

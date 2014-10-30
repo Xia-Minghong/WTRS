@@ -2,12 +2,11 @@
 
 class MCController extends \BaseController {
 
-	/**
-	 * Display a listing of the resource.
-	 * GET /mc
-	 *
-	 * @return Response
-	 */
+    /**
+     * Create a view displaying a list of all absences
+     *
+     * @return mixed
+     */
     public function MClist()
     {
         $MClist = $this->getMClist();
@@ -15,6 +14,11 @@ class MCController extends \BaseController {
         return View::make('admin/reports/showMClist')->with('results',$MClist);
     }
 
+    /**
+     * Create a view displaying a list of MC scores
+     *
+     * @return mixed
+     */
     public function MCscore()
     {
         $MCscore = $this->getMCscores();
@@ -22,6 +26,11 @@ class MCController extends \BaseController {
         return View::make('admin/reports/showMCscore')->with('results',$MCscore);
     }
 
+    /**
+     * Obtain a list of absences from database
+     *
+     * @return mixed
+     */
     private function getMClist()
     {
         return DB::table('absence')->join('teacher', 'absence.short_name', '=', 'teacher.short_name')
@@ -29,6 +38,11 @@ class MCController extends \BaseController {
 //        return Teacher::whereIn('short_name',Absence::where('date','=',new DateTime('today'))->lists('short_name'))->has('absence')->get();
     }
 
+    /**
+     * Obtain a list of MC scores from database
+     *
+     * @return mixed
+     */
     private function getMCscores()
     {
         return Teacher::join('mc_score', 'teacher.short_name', '=', 'mc_score.short_name')
@@ -37,9 +51,8 @@ class MCController extends \BaseController {
     
 
 	/**
-	 * Show the form for creating a new resource.
-	 * GET /mc/create
-	 *
+	 * Show the form for creating a new MC.
+     *
 	 * @return Response
 	 */
 	public function create()
@@ -48,9 +61,8 @@ class MCController extends \BaseController {
 	}
 
 	/**
-	 * Store a newly created resource in storage.
-	 * POST /mc
-	 *
+	 * Store a newly created MC record into database.
+     *
 	 * @return Response
 	 */
 	public function store()
@@ -149,13 +161,10 @@ class MCController extends \BaseController {
 //		//
 //	}
 //
-	/**
-	 * Show the form for editing the specified resource.
-	 * GET /mc/{id}/edit
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
+    /**
+     * Edit MC scores according to the inputs submitted through forms
+     * @return mixed
+     */
 	public function editScore()
 	{
         if(!Input::get('short_name')){  //if reset all
@@ -171,6 +180,12 @@ class MCController extends \BaseController {
         return Redirect::to('admin/reports/MCscore');
 	}
 
+    /**
+     * Create an relief record to be filled for each slot in the timetable of the teacher who is on leave
+     * @param $mc_id
+     * @param $short_name
+     * @param $date
+     */
     private function createRelief($mc_id, $short_name, $date)
     {
         $day = idate( "w", strtotime($date));
@@ -197,12 +212,10 @@ class MCController extends \BaseController {
 //		//
 //	}
 //
-	/**
-	 * Remove the specified resource from storage.
-	 * DELETE
-	 *
-	 * @return Response
-	 */
+    /**
+     * Delete an absence record according to the mc_id provided in the form submission
+     * @return mixed
+     */
 	public function delete()
 	{
         $target = Absence::find(Input::get('mc_id'));

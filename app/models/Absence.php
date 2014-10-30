@@ -19,17 +19,27 @@ class Absence extends Eloquent
 
 
     /**
-     *  Use short_name as primary key.
+     *  Use mc_id as primary key.
      *
      * @var String
      */
     protected $primaryKey = 'mc_id';
 
+    /**
+     * Allow mass assignment on the following variables
+     *
+     * @var array
+     */
     protected $fillable = array('short_name', 'date', 'type');
 
+    /**
+     * Modeling the relationship with the Teacher model
+     *
+     * @return mixed
+     */
     public function teacher()
     {
-        //relaitonship with the Teacher model
-        return $this->belongsTo('Teacher', 'short_name', 'short_name'); //related model, foreign key, local key
+        return $this->belongsTo('Teacher', 'short_name', 'short_name');
+        //related model, foreign key, local key
     }
 }

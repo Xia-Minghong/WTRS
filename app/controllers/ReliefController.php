@@ -2,36 +2,40 @@
 
 class ReliefController extends \BaseController {
 
-	/**
-	 * Display a listing of the resource.
-	 * GET /relief
-	 *
-	 * @return Response
-	 */
-    static $relief_counter = [];    //hold the number of times a teacher is on relief temporarily
+    /**
+     * hold the number of times a teacher is on relief temporarily
+     * @var array
+     */
+    static $relief_counter = [];
 
+    /**
+     * Generate the relief arrangements and display.
+     * @return mixed
+     */
 	public function index()
 	{
         //Delete relief records from the previous day
         $this->deletePrev();
 
         $date = new DateTime('today');
+
+        //If now is weekends, set displayed date to next Monday
         if (date("w") == 0) {
-            $date->add(new DateInterval('P1D'));
+            $date->add(new DateInterval('P1D')); //plus 1 day
         } elseif(date("w") == 6) {
-            $date->add(new DateInterval('P2D'));
+            $date->add(new DateInterval('P2D')); //plus 2 days
         }
 
 
-        //generate relief (ignore reliefed ones)
+        //generate reliefs (ignore relieved ones)
         $relief_timetables = DB::table('relief_timetable')
             ->join('absence','relief_timetable.mc_id','=','absence.mc_id')
             ->where('date','=', $date)
-
-            ->join('teacher', 'teacher.short_name', '=', 'absence.short_name')
-            ->select(array('record_id', 'relief_timetable.mc_id', 'teacher.short_name', 'date', 'full_name', 'slot', 'relief_short_name'))
+            ->join('teacher', 'teacher.short_name', '=', 'absence.short_name')  //join with the teacher information table
+            ->select(array('record_id', 'relief_timetable.mc_id', 'teacher.short_name', 'date', 'full_name', 'slot', 'relief_short_name', 'confirmed'))
             ->get();
 
+        //loop through all slots that needs to be relieved
         foreach($relief_timetables as $relief_timetable) {
             //get the timetable for the teacher on leave
             $timetable = Timetable::where('short_name', '=', $relief_timetable->{'short_name'})
@@ -39,7 +43,7 @@ class ReliefController extends \BaseController {
 
             //add in the corresponding class name, time and venue into the relief timetable
             $relief_timetable->{'slot_value'} = $timetable['slot_' . $relief_timetable->{'slot'}];
-            $relief_timetable->{'slot_time'} = $this->slottotime($relief_timetable->{'slot'});
+            $relief_timetable->{'slot_time'} = $this->slotToTime($relief_timetable->{'slot'});
 
 
 //            if (!$relief_timetable->{'relief_short_name'}) {
@@ -60,21 +64,7 @@ class ReliefController extends \BaseController {
 	}
 
 	/**
-	 * Show the form for creating a new resource.
-	 * GET /relief/create
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 * POST /relief
-	 *
-	 * @return Response
+	 * Store the submitted relief arrangement
 	 */
 	public function store()
 	{
@@ -88,7 +78,6 @@ class ReliefController extends \BaseController {
         //if final submission
         if(Input::get('final')=="yes") {
             //Adding 1 mc score for each teacher
-
             $relief_teachers = array();
             foreach ($reliefs as $record_id => $relief) {
                 if($relief) {
@@ -132,6 +121,11 @@ class ReliefController extends \BaseController {
 //		//
 //	}
 
+    /**
+     * Confirm the relief arrangement, marking all records as "confirmed"
+     *
+     * @return mixed
+     */
 	public function confirm()
 	{
         $date = new DateTime('today');
@@ -141,16 +135,22 @@ class ReliefController extends \BaseController {
             $date->add(new DateInterval('P2D'));
         }
 
-        DB::table('relief_timetable')
-            ->join('absence', 'relief_timetable.mc_id', '=', 'absence.mc_id')
-            ->where('date', '=', $date)
-            ->delete();
+
+        //Mark all reliefs as comfirmed if the submission is confirmed
+        DB::table('relief_timetable')->update(array('confirmed' => 1));
+
+//      @depreciated
+//      Delete all records after confirmation
+//        DB::table('relief_timetable')
+//            ->join('absence', 'relief_timetable.mc_id', '=', 'absence.mc_id')
+//            ->where('date', '=', $date)
+//            ->delete();
         return Redirect::to('/admin');
 	}
 
 	/**
 	 * Delete relief records from previous days
-	 *
+     *
 	 * @return Response
 	 */
 	public function deletePrev()
@@ -161,13 +161,21 @@ class ReliefController extends \BaseController {
             ->delete();
 	}
 
-    private function slottotime($slot)
+    /**
+     * convert the slot ID (1-13) in to corresponding time slot strings
+     *
+     * @param $slot
+     * @return mixed
+     */
+    private function slotToTime($slot)
     {
         $slot_str = array();
         for($i=0;$i<=21600;$i+=1800){
             if ($i<=18000) {
+                //07:30-08:30 ... 12:30-13:30
                 array_push($slot_str, date('H:i', mktime(7, 30, 0, 1, 1) + $i).'-'.date('H:i', mktime(7, 30, 0, 1, 1) + $i + 1800));
             } else {
+                //special slots calculation of 13:00-13:25 and 13:25-13:50
                 array_push($slot_str, date('H:i', mktime(7, 30, 0, 1, 1) + $i).'-'.date('H:i', mktime(7, 30, 0, 1, 1) + $i + 1500));
                 $i-=300;
             }
@@ -175,6 +183,14 @@ class ReliefController extends \BaseController {
         return $slot_str[$slot-1];
     }
 
+    /**
+     * Return a list of teachers who are available to relief at the given slot
+     *
+     * @param $date
+     * @param $day
+     * @param $slot
+     * @return array
+     */
     private function getReliefTeacher($date, $day, $slot)
     {
         //Select group 1 teachers first
@@ -185,11 +201,10 @@ class ReliefController extends \BaseController {
                     ->where('slot_'.$slot, '=', '')
                     ->lists('short_name')
             )
-            ->select('teacher.short_name','grouping')
+            ->select('teacher.short_name', 'teacher.full_name', 'grouping')
             ->get()->toArray();
-//
-//            ->lists('teacher.short_name','grouping');
 
+        //Select group 2 teachers
         $grp2_teachers = DB::table('teacher')
             ->whereNotIn('teacher.short_name', Absence::where('date','=',$date)->lists('short_name'))
             ->where('teacher.grouping','=',2)
@@ -200,10 +215,8 @@ class ReliefController extends \BaseController {
             )
             ->join('mc_score', 'teacher.short_name', '=', 'mc_score.short_name')
             ->orderBy('mc_score')
-            ->select('teacher.short_name','grouping', 'mc_score')
+            ->select('teacher.short_name', 'teacher.full_name', 'grouping', 'mc_score')
             ->get();
-//            ->select('teacher.short_name','grouping')
-//            ->lists('teacher.short_name');
 
         //Map the group 2 query result (json object) to array
         $grp2_teachers = array_map(function($val)
@@ -250,6 +263,13 @@ class ReliefController extends \BaseController {
         return $teachers;
     }
 
+    /**
+     * Given the name of the teacher and day of week, calculate the number of vacant slots
+     *
+     * @param $short_name
+     * @param $day
+     * @return int
+     */
     private function countVacantSlot($short_name, $day)
     {
         $count = 0;

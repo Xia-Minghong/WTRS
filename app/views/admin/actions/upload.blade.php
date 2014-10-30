@@ -30,7 +30,7 @@
                   <div class="panel-body">
                   @if($errors->has() && $errors->get('type')[0]=='particular')
                       @if($errors->get('success')[0])
-                        <div class="text-success">Particulars Imported</div>
+                        <div class="text-success">Particulars Imported, empty short names are filled with full names</div>
                       @else
                         <div class="text-danger">{{ $errors->get('message')[0] }}<p><a href="/admin/actions/upload">Retry</a></p></div>
                       @endif

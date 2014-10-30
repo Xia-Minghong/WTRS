@@ -2,22 +2,31 @@
 
 class AdminController extends \BaseController {
 
-	/**
-	 * Display a listing of the resource.
-	 * GET /admin
-	 *
-	 * @return Response
-	 */
+    /**
+     * Redirect the URL visit of "/admin" to "/admin/actions/generaterelief"
+     *
+     * @return mixed
+     */
     public function index()
     {
         return Redirect::to('admin/actions/generaterelief');
     }
 
+    /**
+     * Create and return the admin signin view
+     *
+     * @return mixed
+     */
 	public function signin()
 	{
         return View::make("admin/signin");
 	}
 
+    /**
+     * Verify the admin account from the sign in page and redirect according to the result of authentication
+     *
+     * @return mixed
+     */
     public function signinVerify()
     {
         if (Auth::admin()->attempt(array('username' => Input::get('username'), 'password' => Input::get('password'))))
@@ -28,17 +37,32 @@ class AdminController extends \BaseController {
         return Redirect::to('admin/signin')->withErrors(array('message'=>'Wrong Credentials!'));
     }
 
+    /**
+     * Sign out the admin
+     *
+     * @return mixed
+     */
     public function signout()
     {
         Auth::admin()->logout();
         return Redirect::to('/');
     }
 
+    /**
+     * Create the view for changing admin password
+     *
+     * @return mixed
+     */
     public function changepwd()
     {
         return View::make('admin/actions/changepwd');
     }
 
+    /**
+     * Store the new admin password
+     *
+     * @return mixed
+     */
     public function storepwd()
     {
         $admin = Auth::admin()->get();
@@ -48,12 +72,10 @@ class AdminController extends \BaseController {
     }
 
 
-
     /**
-     * Show the form for uploading a new resource.
-     * GET /admin/timetable/uploade
+     * Create the view for the system input upload page
      *
-     * @return Response
+     * @return mixed
      */
     public function upload()
     {

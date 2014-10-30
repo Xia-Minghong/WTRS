@@ -12,9 +12,11 @@ class CreateTeacher extends Migration {
 	 */
 	public function up()
 	{
+        //If the table exists, drop it
         if (Schema::hasTable('teacher')) {
             CreateTeacher::down();
         }
+
         Schema::create('teacher', function(Blueprint $table)
         {
             $table->string('nric', 9);
@@ -24,7 +26,7 @@ class CreateTeacher extends Migration {
             $table->string('designation');
             $table->integer('grouping');
             $table->string('email_address');
-//            $table->string('contact_nos');
+            $table->string('contact_nos');
             $table->rememberToken();    //record cookie token to prevent cookie hijacking
         });
 
