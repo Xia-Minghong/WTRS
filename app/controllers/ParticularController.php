@@ -97,7 +97,7 @@ class ParticularController extends \BaseController {
 	public function store()
 	{
         $file = Input::file('particularfile');
-        $destinationPath = 'uploads';
+        $destinationPath = public_path().'/uploads';
 
         $filename = 'particulars';
         $upload_success = Input::file('particularfile')->move($destinationPath, $filename);

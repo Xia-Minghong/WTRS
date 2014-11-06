@@ -25,7 +25,7 @@
                         {{ Session::get('message') }}
                     @endif
                     </p></div>
-                {{ Form::open(array('name'=>'MCsubmission','class'=>'MCForm','role'=>'form', 'action'=>'MCController@store')) }}
+                {{ Form::open(array('name'=>'MCsubmission','class'=>'AdminMCForm','role'=>'form', 'action'=>'MCController@store')) }}
                         <fieldset>
                         <div class="form-group">
                         <input class="form-control" placeholder="NRIC" name="nric" type="username" autofocus>

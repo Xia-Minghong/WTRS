@@ -86,7 +86,7 @@
 
 
 
-<div class="row" ng-hide="!records.length || records.0.confirmed==1">
+<div class="row" ng-hide="!records.length || records[records.length-1].confirmed==1">
 
 
 @if(!($errors->has() && $errors->get('final')))
@@ -102,7 +102,7 @@
 @endif
 </div>
 <div class="row" ng-show="!records.length">
-<div class="alert alert-success">No relif to be assigned.</div>
+<div class="alert alert-success">No relief to be assigned.</div>
 </div>
 {{ FORM::close() }}
 

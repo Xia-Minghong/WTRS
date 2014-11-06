@@ -3,10 +3,16 @@
 class ReliefController extends \BaseController {
 
     /**
-     * hold the number of times a teacher is on relief temporarily
+     * hold the number of times a group 1 teacher is on relief temporarily
      * @var array
      */
-    static $relief_counter = [];
+    static $grp1_relief_counter = [];
+
+    /**
+     * hold the number of times a group 2 teacher is on relief temporarily
+     * @var array
+     */
+    static $grp2_relief_counter = [];
 
     /**
      * Generate the relief arrangements and display.
@@ -97,29 +103,6 @@ class ReliefController extends \BaseController {
         return Redirect::to('admin/actions/generaterelief')->withErrors(['success'=>true]);
 	}
 
-//	/**
-//	 * Display the specified resource.
-//	 * GET /relief/{id}
-//	 *
-//	 * @param  int  $id
-//	 * @return Response
-//	 */
-//	public function show($id)
-//	{
-//		//
-//	}
-
-//	/**
-//	 * Show the form for editing the specified resource.
-//	 * GET /relief/{id}/edit
-//	 *
-//	 * @param  int  $id
-//	 * @return Response
-//	 */
-//	public function edit($id)
-//	{
-//		//
-//	}
 
     /**
      * Confirm the relief arrangement, marking all records as "confirmed"
@@ -134,7 +117,7 @@ class ReliefController extends \BaseController {
         } elseif(date("w") == 6) {
             $date->add(new DateInterval('P2D'));
         }
-
+        $day = idate("w", strtotime($date->format("d-m-Y")));
 
         //Mark all reliefs as comfirmed if the submission is confirmed
         DB::table('relief_timetable')->update(array('confirmed' => 1));
@@ -145,7 +128,26 @@ class ReliefController extends \BaseController {
 //            ->join('absence', 'relief_timetable.mc_id', '=', 'absence.mc_id')
 //            ->where('date', '=', $date)
 //            ->delete();
-        return Redirect::to('/admin');
+
+        //get data for the relief message sheet
+        $relief_timetables = DB::table('relief_timetable')
+            ->join('teacher as relief_teacher', 'relief_timetable.relief_short_name', '=', 'relief_teacher.short_name')
+            ->join('absence','relief_timetable.mc_id','=','absence.mc_id')
+            ->join('teacher as on_leave_teacher', 'on_leave_teacher.short_name', '=', 'absence.short_name')
+            ->join('timetable', 'timetable.short_name', '=', 'on_leave_teacher.short_name')
+            ->where('timetable.day', '=', $day)
+            ->where('absence.date', '=', $date)
+            ->orderBy('relief_timetable.relief_short_name')
+            ->select(
+                'relief_teacher.title as relief_teacher_title',
+                'relief_teacher.full_name as relief_teacher_full_name',
+                'on_leave_teacher.title as on_leave_teacher_title',
+                'on_leave_teacher.full_name as on_leave_teacher_full_name',
+                'timetable.*',
+                'relief_timetable.slot'
+            )->get();
+        //create the relief message sheet
+        return View::make('admin/reports/reliefmessages')->with('results', $relief_timetables);
 	}
 
 	/**
@@ -184,6 +186,20 @@ class ReliefController extends \BaseController {
     }
 
     /**
+     * A function to compare group 1 teachers according to the grp1_relief_counter
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    private function cmpTeacher($a, $b)
+    {
+        if (self::$grp1_relief_counter[$a['short_name']] == self::$grp1_relief_counter[$b['short_name']]) {
+            return 0;
+        }
+        return (self::$grp1_relief_counter[$a['short_name']] < self::$grp1_relief_counter[$b['short_name']]) ? -1:1;
+    }
+
+    /**
      * Return a list of teachers who are available to relief at the given slot
      *
      * @param $date
@@ -203,6 +219,19 @@ class ReliefController extends \BaseController {
             )
             ->select('teacher.short_name', 'teacher.full_name', 'grouping')
             ->get()->toArray();
+
+        foreach ($grp1_teachers as $key=>$grp1_teacher) {
+            //Add all group 1 teachers in to grp1_relief_counter
+            if(!array_key_exists($grp1_teacher['short_name'], self::$grp1_relief_counter)) {
+                self::$grp1_relief_counter[$grp1_teacher['short_name']] = 0;
+            }
+        }
+
+        //Sort the grp1_teachers in decreasing order according to the relief counter
+        uasort($grp1_teachers, 'self::cmpTeacher');
+
+        //fix the array index
+        $grp1_teachers = array_values($grp1_teachers);
 
         //Select group 2 teachers
         $grp2_teachers = DB::table('teacher')
@@ -231,11 +260,13 @@ class ReliefController extends \BaseController {
         $head_key = 0; //keep track of the key value of the first item in the candidate array
         foreach ($candidates as $key=>$teacher) {
             $priority+=1;
-            //keep the number of reliefs for each teacher below 2
-            //Make sure the teacher has at least two vacant slots
-            if (array_key_exists($teacher['short_name'], self::$relief_counter)
-                && (self::$relief_counter[$teacher['short_name']]>=2
-                || $this->countVacantSlot($teacher['short_name'], $day) - self::$relief_counter[$teacher['short_name']] <= 2)
+
+            //Use group1 teachers first until each of them has only 2 vacant slots for the day
+            //Then use group2 teacher, keep the number of reliefs for each group2 teacher below 2
+            //Make sure each teacher has at least 2 vacant slots
+            if (array_key_exists($teacher['short_name'], self::$grp2_relief_counter)
+                && (self::$grp2_relief_counter[$teacher['short_name']]>=2
+                || $this->countVacantSlot($teacher['short_name'], $day) - self::$grp2_relief_counter[$teacher['short_name']] <= 2)
             ) {
                 unset($candidates[$key]);
                 //if the removed is the first teacher, the relief counter for the next teacher should be increased by 1
@@ -245,13 +276,19 @@ class ReliefController extends \BaseController {
                     $head_key += 1;
                 }
             } else {
-                if(!array_key_exists($teacher['short_name'], self::$relief_counter)) {
-                    self::$relief_counter[$teacher['short_name']]=0;
+                if(!array_key_exists($teacher['short_name'], self::$grp2_relief_counter)) {
+                    self::$grp2_relief_counter[$teacher['short_name']]=0;
                 }
-                if($priority == 1) {
-                    self::$relief_counter[$teacher['short_name']]+=1;
+
+                //+1 in the grp1_relief_counter for the default teacher chosen to be displayed
+                if($priority == 1 && $teacher['grouping']==1) {
+                    self::$grp1_relief_counter[$teacher['short_name']]+=1;
                 }
-                //+1 in the relief_counter for the default teacher chosen to be displayed
+
+                //+1 in the grp2_relief_counter for the default teacher chosen to be displayed
+                if($priority == 1 && $teacher['grouping']==2) {
+                    self::$grp2_relief_counter[$teacher['short_name']]+=1;
+                }
             }
         }
 

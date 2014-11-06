@@ -97,7 +97,7 @@ class TimeTableController extends BaseController {
 	public function store()
 	{
         $file = Input::file('timetablefile');
-        $destinationPath = 'uploads';
+        $destinationPath = public_path().'/uploads';
 
         $filename = 'timetables';
         //$extension =$file->getClientOriginalExtension();

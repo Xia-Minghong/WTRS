@@ -142,7 +142,83 @@ $('.ChangePassForm').bootstrapValidator({
     }
 });
 
+//Validation for Teacher MC submission form
 $('.MCForm').bootstrapValidator({
+    message: 'This value is not valid',
+    fields: {
+        nric: {
+            message: 'The nric is not valid',
+            validators: {
+                notEmpty: {
+                    message: 'The nric is required and cannot be empty'
+                },
+                stringLength: {
+                    min: 9,
+                    max: 9,
+                    message: 'The nric must be 9 characters long'
+                },
+                regexp: {
+                    regexp: /^[a-zA-Z0-9_]+$/,
+                    message: 'The nric can only consist of alphabetical and number'
+                }
+            }
+        },
+        fromdate: {
+            validators: {
+                notEmpty: {
+                    message: 'The starting date cannot be empty'
+                },
+                callback: {
+                    message: 'You cannot apply for today\'s leave after 07:00am',
+                    callback: function (value, validator) {
+                        var today = new Date();
+                        var dd = today.getDate();
+                        var mm = today.getMonth() + 1; //January is 0!
+
+                        var yyyy = today.getFullYear();
+                        if (dd < 10) {
+                            dd = '0' + dd
+                        }
+                        if (mm < 10) {
+                            mm = '0' + mm
+                        }
+                        var today = dd + '-' + mm + '-' + yyyy;
+
+                        var hours = (new Date).getHours();
+                        var minutes = (new Date).getMinutes();
+                        if (hours > 7  && value == today) {    //if after 07:00, cutoff the application for the current day
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }
+        },
+        todate:{
+            validators:{
+                notEmpty: {
+                    message: 'The ending date cannot be empty'
+                },
+                callback: {
+                    message: 'The ending date must not be before the starting date',
+                    callback: function(value, validator) {
+                        var todate = new moment(value, 'DD-MM-YYYY', true);
+                        var fromdate = new moment($('[name="fromdate"]').val(), 'DD-MM-YYYY', true);
+                        if (!todate.isValid()) {
+                            return false;
+                        }
+                        // Check if the date in our range
+                        //alert(todate.diff(fromdate));
+                        return (todate.isAfter(fromdate) || todate.isSame(fromdate));
+                    }
+                }
+            }
+        }
+    }
+});
+
+//Validation for Admin MC submission form
+$('.AdminMCForm').bootstrapValidator({
     message: 'This value is not valid',
     fields: {
         nric: {
@@ -192,9 +268,16 @@ $('.MCForm').bootstrapValidator({
     }
 });
 
+//Revalidate on change
 $('.datepicker, .admindatepicker').on('changeDate', function (ev) {
     $('.MCForm').bootstrapValidator('revalidateField', 'todate');
     $('.MCForm').bootstrapValidator('revalidateField', 'fromdate');
+});
+
+//Revalidate on change
+$('.datepicker, .admindatepicker').on('changeDate', function (ev) {
+    $('.AdminMCForm').bootstrapValidator('revalidateField', 'todate');
+    $('.AdminMCForm').bootstrapValidator('revalidateField', 'fromdate');
 });
 
 //$('.editMCForm').bootstrapValidator({

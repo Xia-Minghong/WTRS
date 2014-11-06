@@ -97,8 +97,10 @@ class MCController extends \BaseController {
                         //create blank relief records for each slot having class, to be filled by admin
                         $this->createRelief($mc_id, $teacher['short_name'], $date);
 
-                        //reduce 1 mc score from the teacher
-                        MCScore::find($teacher['short_name'])->decrement('mc_score');
+                        //reduce 1 mc score from the teacher if its medical leave
+                        if (Input::get('type') == '1') {
+                            MCScore::find($teacher['short_name'])->decrement('mc_score');
+                        }
                     }
                 }
 
@@ -135,8 +137,10 @@ class MCController extends \BaseController {
                     //create blank relief records for each slot having class, to be filled by admin
                     $this->createRelief($mc_id, $short_name, $date);
 
-                    //reduce 1 mc score from the teacher who applies.
-                    MCScore::find($short_name)->decrement('mc_score');
+                    //reduce 1 mc score from the teacher who applies for a medical leave.
+                    if(Input::get('type')=='1') {
+                        MCScore::find($short_name)->decrement('mc_score');
+                    }
                 }
             }
 
@@ -223,9 +227,10 @@ class MCController extends \BaseController {
 
         $target->delete();
 
-        //adding back the MC score
-        MCScore::find($short_name)->increment('mc_score');
-
+        //adding back the MC score if it is a medical leave
+        if ($target->type == '1') {
+            MCScore::find($short_name)->increment('mc_score');
+        }
 
         return Redirect::to('admin/reports/MClist')->withErrors(['success' => true]);
 	}
