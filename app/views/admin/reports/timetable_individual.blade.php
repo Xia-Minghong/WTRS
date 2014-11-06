@@ -2,7 +2,7 @@
 <div class="col-md-12 col-lg-10 table-responsive">
 @if($errors->has() && $errors->get('success'))
       <div class="alert alert-success" role="alert">
-      Timetable successfully created<p><a href="/admin/reports/timetable">Add More</a></p>
+      Timetable successfully created<p><a href="{{ URL::to('admin/reports/timetable')}}">Add More</a></p>
       </div>
 @endif
 <div class="panel panel-default">

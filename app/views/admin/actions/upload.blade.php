@@ -32,7 +32,7 @@
                       @if($errors->get('success')[0])
                         <div class="text-success">Particulars Imported, empty short names are filled with full names</div>
                       @else
-                        <div class="text-danger">{{ $errors->get('message')[0] }}<p><a href="/admin/actions/upload">Retry</a></p></div>
+                        <div class="text-danger">{{ $errors->get('message')[0] }}<p><a href="{{ URL::to('admin/actions/upload')}}">Retry</a></p></div>
                       @endif
                   @else
                   {{ Form::open(array('name'=>'ParticularForm','class'=>'ParticularForm',
@@ -71,7 +71,7 @@
                     @if($errors->get('success')[0])
                       <div class="text-success">Timetables Imported</div>
                     @else
-                      <div class="text-danger">{{ $errors->get('message')[0] }}<p><a href="/admin/actions/upload">Retry</a></p></div>
+                      <div class="text-danger">{{ $errors->get('message')[0] }}<p><a href="{{ URL::to('admin/actions/upload')}}">Retry</a></p></div>
                     @endif
                 @else
                 {{ Form::open(array('name'=>'TimeTableForm','class'=>'TimeTableForm','role'=>'form'
@@ -97,7 +97,7 @@
                 @endif
                 <div class="row">
                 <div class="col-md-8">
-                <a href="/admin/reports/timetable">Check who doesn't have any timetable</a>
+                <a href="{{ URL::to('admin/reports/timetable')}}">Check who doesn't have any timetable</a>
                 </div>
                 </div>
                 </div>

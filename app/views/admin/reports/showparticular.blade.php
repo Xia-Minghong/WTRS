@@ -72,7 +72,7 @@
         <td>{% particular.nric %}</td>
         <td>{% particular.title %}</td>
         <td>{% particular.full_name %}</td>
-        <td><a href="/admin/reports/timetable/{% particular.short_name %}">{% particular.short_name %}</a></td>
+        <td><a href="{{ URL::to('admin/reports/timetable')}}/{% particular.short_name %}">{% particular.short_name %}</a></td>
         <td>{% particular.designation %}</td>
         <td>{% particular.grouping %}</td>
         <td>{% particular.email_address %}</td>
@@ -82,7 +82,7 @@
 </table>
 <div class="row">
 <div class="alert alert-danger" ng-hide="particulars.length">
-No Teacher in database. <strong>Please <a href="/admin/actions/upload">upload teachers' particulars</a></strong>
+No Teacher in database. <strong>Please <a href="{{ URL::to('admin/actions/upload')}}">upload teachers' particulars</a></strong>
 </div>
 </div>
 </div>

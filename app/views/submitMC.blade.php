@@ -12,7 +12,7 @@
 
                 <div class="panel-body">
                 @if($errors->has() && $errors->get('success'))
-                    <div class="text-success">Your MC has been successfully submitted<p><a href="/signout">Sign Out</a></p></div>
+                    <div class="text-success">Your MC has been successfully submitted<p><a href="{{ URL::to('signout')}}">Sign Out</a></p></div>
                 @else
                 {{ Form::open(array('name'=>'MCsubmission','class'=>'MCForm','role'=>'form', 'action'=>'MCController@store')) }}
                         <fieldset>

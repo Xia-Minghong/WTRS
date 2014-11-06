@@ -18,7 +18,7 @@
                 </div>
                 <div class="panel-body">
                  @if($errors->has('success') && $errors->get('success')==true)
-                    <div class="text-success">Your MC has been successfully submitted<p><a href="/admin/actions/createMC">Enter Another</a></p></div>
+                    <div class="text-success">Your MC has been successfully submitted<p><a href="{{ URL::to('admin/actions/createMC')}}">Enter Another</a></p></div>
                  @else
                     <div class="text-danger"><p>
                     @if(Session::has('message'))

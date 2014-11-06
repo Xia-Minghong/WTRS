@@ -16,13 +16,13 @@
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Reports<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a @if(Request::is('admin/reports/particular')) class="active" @endif href="/admin/reports/particular">Teachers' Particulars</a>
+                                    <a @if(Request::is('admin/reports/particular')) class="active" @endif href="{{ URL::to('admin/reports/particular')}}">Teachers' Particulars</a>
                                 </li>
                                 <li>
-                                    <a @if(Request::is('admin/reports/MClist')) class="active" @endif href="/admin/reports/MClist">MC List</a>
+                                    <a @if(Request::is('admin/reports/MClist')) class="active" @endif href="{{ URL::to('admin/reports/MClist')}}">MC List</a>
                                 </li>
                                 <li>
-                                    <a @if(Request::is('admin/reports/MCscore')) class="active" @endif href="/admin/reports/MCscore">MC Scores</a>
+                                    <a @if(Request::is('admin/reports/MCscore')) class="active" @endif href="{{ URL::to('admin/reports/MCscore')}}">MC Scores</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -37,16 +37,16 @@
                             <a href="#"><i class="fa fa-edit fa-fw"></i> Actions<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a @if(Request::is('admin/actions/createMC')) class="active" @endif href="/admin/actions/createMC">Create New MC</a>
+                                    <a @if(Request::is('admin/actions/createMC')) class="active" @endif href="{{ URL::to('admin/actions/createMC')}}">Create New MC</a>
                                 </li>
                                 <li>
-                                    <a @if(Request::is('admin/actions/generaterelief')) class="active" @endif href="/admin/actions/generaterelief"><strong>Generate Relief Timetables</strong></a>
+                                    <a @if(Request::is('admin/actions/generaterelief')) class="active" @endif href="{{ URL::to('admin/actions/generaterelief')}}"><strong>Generate Relief Timetables</strong></a>
                                 </li>
                                 <li>
-                                    <a @if(Request::is('admin/reports/timetable')) class="active" @endif href="/admin/reports/timetable">Additional Timetables</a>
+                                    <a @if(Request::is('admin/reports/timetable')) class="active" @endif href="{{ URL::to('admin/reports/timetable')}}">Additional Timetables</a>
                                 </li>
                                 <li>
-                                    <a @if(Request::is('admin/actions/changepwd')) class="active" @endif href="/admin/actions/changepwd">Change Admin Password</a>
+                                    <a @if(Request::is('admin/actions/changepwd')) class="active" @endif href="{{ URL::to('admin/actions/changepwd')}}">Change Admin Password</a>
                                 </li>
 
                             </ul>
@@ -83,7 +83,7 @@
                             {{--<!-- /.nav-second-level -->--}}
                         {{--</li>--}}
                         <li>
-                            <a @if(Request::is('admin/actions/upload')) class="active" @endif href="/admin/actions/upload"><i class="fa fa-files-o fa-fw"></i> Upload Timetables/Particulars</a>
+                            <a @if(Request::is('admin/actions/upload')) class="active" @endif href="{{ URL::to('admin/actions/upload')}}"><i class="fa fa-files-o fa-fw"></i> Upload Timetables/Particulars</a>
                             <!-- /.nav-second-level -->
                         </li>
                     </ul>

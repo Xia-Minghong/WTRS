@@ -5,7 +5,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="/">WTRS Teacher Relief System</a>
+    <a class="navbar-brand" href="{{ URL::to('/')}}">WTRS Teacher Relief System</a>
 </div>
 <!-- /.navbar-header -->
 <ul class="nav navbar-top-links navbar-right">
@@ -206,15 +206,15 @@
         <ul class="dropdown-menu dropdown-user">
             {{--<li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>--}}
             {{--</li>--}}
-            <li><a href="/admin"><i class="fa fa-gear fa-fw"></i> Admin</a>
+            <li><a href="{{ URL::to('admin')}}"><i class="fa fa-gear fa-fw"></i> Admin</a>
             </li>
             @if(Auth::admin()->check())
-            <li><a href="/admin/signout"><i class="fa fa-sign-out fa-fw"></i> Admin Sign Out</a>
+            <li><a href="{{ URL::to('admin/signout')}}"><i class="fa fa-sign-out fa-fw"></i> Admin Sign Out</a>
             </li>
             @endif
             @if(Auth::teacher()->check())
             <li class="divider"></li>
-            <li><a href="/signout"><i class="fa fa-sign-out fa-fw"></i> Sign Out</a>
+            <li><a href="{{ URL::to('signout')}}"><i class="fa fa-sign-out fa-fw"></i> Sign Out</a>
             </li>
             @endif
         </ul>

@@ -2,7 +2,7 @@
  <div class="row">
  <div class="col-lg-6">
  <button onclick="javascript:window.print()" class="btn btn-success">Print messages</button>
- <a href="/admin/">Back to Admin Page</a><br>&nbsp;
+ <a href="{{ URL::to('admin')}}">Back to Admin Page</a><br>&nbsp;
  </div>
  </div>
  <?php $count=0;?>

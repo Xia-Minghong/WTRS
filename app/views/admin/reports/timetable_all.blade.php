@@ -68,7 +68,7 @@
      <td>{% teacher.short_name %}</td>
      <td>{% teacher.grouping %}</td>
      <td>
-        <a class="btn btn-info btn-block" href="/admin/actions/createtimetable/{% teacher.short_name %}">Assign Timetable</a>
+        <a class="btn btn-info btn-block" href="{{ URL::to('admin/actions/createtimetable')}}/{% teacher.short_name %}">Assign Timetable</a>
      </td>
 </tr>
 

@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="col-lg-offset-9 col-md-offset-9 col-sm-offset-9">
-          <a class="btn btn-success" href="/admin/actions/createMC">Add New</a>
+          <a class="btn btn-success" href="{{ URL::to('admin/actions/createMC')}}">Add New</a>
     </div>
 </div>
 
