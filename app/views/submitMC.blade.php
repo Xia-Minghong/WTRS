@@ -14,7 +14,7 @@
                 @if($errors->has() && $errors->get('success'))
                     <div class="text-success">Your MC has been successfully submitted<p><a href="{{ URL::to('signout')}}">Sign Out</a></p></div>
                 @else
-                {{ Form::open(array('name'=>'MCsubmission','class'=>'MCForm','role'=>'form', 'action'=>'MCController@store')) }}
+                <form name="MCsubmission" class="MCForm" role="form" action="{{URL::to('/')}}/" method="post">
                         <fieldset>
                         <div class="form-group">
                         <label>Name:&nbsp;</label>{{ Auth::teacher()->get()->short_name }}
@@ -40,11 +40,11 @@
                             </div>
                         <div class="text-danger"><label>Remarks:&nbsp;</label>*Please contact the admin office if you have other requirements.</div>
                         <div class="text-info">*Weekends will be automatically left out.</div>
-    <br/>
+                        <br/>
 
-                            {{ Form::submit('Submit', array('class'=>'btn btn-success btn-block')) }}
-                        </fieldset>
-                {{ FORM::close() }}
+                            <input type="submit" class="btn btn-success btn-block"/>
+                            </fieldset>
+                    </form>
                 @endif
                 </div>
             </div>

@@ -25,7 +25,7 @@
                         {{ Session::get('message') }}
                     @endif
                     </p></div>
-                {{ Form::open(array('name'=>'MCsubmission','class'=>'AdminMCForm','role'=>'form', 'action'=>'MCController@store')) }}
+                    <form name="MCsubmission" class="AdminMCForm" role="form" action="{{URL::to('/')}}/" method="post">
                         <fieldset>
                         <div class="form-group">
                         <input class="form-control" placeholder="NRIC" name="nric" type="username" autofocus>
@@ -50,9 +50,9 @@
                                 <input type="hidden" name="isAdmin" value="true"/>
                             </div>
                             <div class="text-info">*Weekends will be automatically left out.</div>
-                            {{ Form::submit('Submit', array('class'=>'btn btn-success btn-block')) }}
+                            <input type="submit" class="btn btn-success btn-block"/>
                         </fieldset>
-                {{ FORM::close() }}
+                </form>
                 @endif
                 </div>
 
