@@ -33,7 +33,7 @@ class ReliefTimetable extends Eloquent
     protected $fillable = array('mc_id', 'slot', 'relief_short_name');
 
     /**
-     * Modeling the relationship with the Teacher model
+     * Modeling the relationship with the absence model
      *
      * @return mixed
      */
