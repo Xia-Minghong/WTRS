@@ -34,7 +34,7 @@
 <div class="row">
 @if($errors->has() && $errors->get('final'))
     <div class="col-md-9">
-          <a class="btn btn-danger" href="{{ URL::to('admin/actions/generaterelief/confirm')}}">Confirm & Send Email</a><br>
+          <a class="btn btn-danger" href="{{ URL::to('admin/actions/generaterelief/confirm')}}">Confirm & Print</a><br>
     </div>
 @endif
 </div>
